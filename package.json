@@ -1,10 +1,10 @@
 {
-  "name": "ip-tag",
+  "name": "import-aws",
   "types": ["module"],
   "version": "1.4",
-  "homepage": "http://github.com/shinken-monitoring/mod-ip-tag",
+  "homepage": "http://github.com/shinken-monitoring/mod-import-aws",
   "author": "Jean Gabès",
-  "description": "Tag host by their IP ranges",
+  "description": "Import hosts from AWS regions",
   "contributors": [
     {
       "name": "Jean Gabès",
@@ -15,11 +15,13 @@
       "email": "andrus@a7k.pri.ee"
     }  
   ],
-  "repository": "https://github.com/shinken-monitoring/mod-ip-tag",
+  "repository": "https://github.com/shinken-monitoring/mod-import-aws",
   "keywords": [
     "module",
     "arbiter",
-    "ip"
+    "import",
+    "aws",
+    "amazon"
   ],
   "dependencies": {
     "shinken": ">=1.4"
