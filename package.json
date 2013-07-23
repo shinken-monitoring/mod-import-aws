@@ -9,7 +9,11 @@
     {
       "name": "Jean Gabès",
       "email": "naparuba@gmail.com"
-    }
+    },
+    {
+      "name": "Andrus Viik",
+      "email": "andrus@a7k.pri.ee"
+    }  
   ],
   "repository": "https://github.com/shinken-monitoring/mod-ip-tag",
   "keywords": [
