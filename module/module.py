@@ -57,27 +57,29 @@ def get_instance(plugin):
     api_key = str(plugin.api_key.strip())
     secret = str(plugin.secret.strip())
     default_template = getattr(plugin, 'default_template', '')
+    regions = getattr(plugin, 'regions', 'ec2_us_east').split(',')
     
-    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template)
+    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template, regions)
     return instance
 
 
 # Retrieve hosts from AWS API
 class AWS_importer_arbiter(BaseModule):
-    def __init__(self, mod_conf, api_key, secret, default_template):
+    def __init__(self, mod_conf, api_key, secret, default_template, regions):
         BaseModule.__init__(self, mod_conf)
         self.api_key = api_key
         self.secret = secret
         self.default_template = default_template
-        self.driver = None
-        self.con = None
+        self.regions = regions
+        self.cons = []
 
 
     # Called by Arbiter to say 'let's prepare yourself guy'
     def init(self):
         logger.debug("[AWS Importer Module]: Try to open a AWS connection")
-        self.driver = get_driver(Provider.EC2)
-        self.con = self.driver(self.api_key, self.secret)
+        for region in self.regions:
+            self.cons.append(get_driver(region)(self.api_key, self.secret))
+
         logger.info("[AWS Importer Module]: Connection opened")
 
 
@@ -87,8 +89,10 @@ class AWS_importer_arbiter(BaseModule):
         r = {'hosts' : []}
 
         # Ok get all!
+        nodes = []
         try:
-            nodes = self.con.list_nodes()
+            for conn in self.cons:
+                nodes.extend(conn.list_nodes())
         except Exception, exp:
             logger.error("[AWS Importer Module]: Error during the node listing '%s'" % exp)
             raise
