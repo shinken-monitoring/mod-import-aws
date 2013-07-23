@@ -49,27 +49,29 @@ properties = {
 # called by the plugin manager to get a broker
 def get_instance(plugin):
     logger.debug("[AWS Importer Module]: Get Landscape importer instance for plugin %s" % plugin.get_name())
-    
+
     if not Provider:
         raise Exception('Missing module libcloud. Please install it from http://libcloud.apache.org/index.html')
-    
+
     # Beware : we must have RAW string here, not unicode!
     api_key = str(plugin.api_key.strip())
     secret = str(plugin.secret.strip())
     default_template = getattr(plugin, 'default_template', '')
+    ignore_tag = getattr(plugin, 'ignore_tag', None)
     regions = getattr(plugin, 'regions', 'ec2_us_east').split(',')
     
-    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template, regions)
+    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template, ignore_tag,regions)
     return instance
 
 
 # Retrieve hosts from AWS API
 class AWS_importer_arbiter(BaseModule):
-    def __init__(self, mod_conf, api_key, secret, default_template, regions):
+    def __init__(self, mod_conf, api_key, secret, default_template, ignore_tag, regions):
         BaseModule.__init__(self, mod_conf)
         self.api_key = api_key
         self.secret = secret
         self.default_template = default_template
+        self.ignore_tag = ignore_tag
         self.regions = regions
         self.cons = []
 
@@ -100,8 +102,7 @@ class AWS_importer_arbiter(BaseModule):
 
         for n in nodes:
             h = {}
-            hosts.append(h)
-            
+
             # The templates we will use to really configure the VM
             tags = []
             if self.default_template:
@@ -131,20 +132,23 @@ class AWS_importer_arbiter(BaseModule):
                     h[prop] = ','.join(['%s:%s' % (i, j) for (i,j) in v.iteritems()])
                 else:
                     h[prop] = unicode(v)
-
                 # Special hooks
                 # We take the "use" tag as a use parameter
                 if k == 'tags' and 'use' in v:
-                    tags.append(v['use'])
+                    if v['use'] == self.ignore_tag:
+                        break
+                    else:
+                        tags.append(v['use'])
                 # Also put as template the instance type
                 if k == 'instancetype':
                     tags.append(v)
-                        
-            # The tag order is not the good, precise data are on the end, we want them
-            # first
-            tags.reverse()
-            h['use'] = ','.join(tags)
-            
+            else:
+                # The tag order is not the good, precise data are on the end, we want them
+                # first
+                tags.reverse()
+                h['use'] = ','.join(tags)
+                hosts.append(h)
+
         print "Discovered hosts"
         pprint(hosts)
         logger.info("[AWS Importer Module]: Returning to Arbiter %d hosts" % len(r['hosts']))
