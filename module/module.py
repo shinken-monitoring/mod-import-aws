@@ -59,20 +59,22 @@ def get_instance(plugin):
     default_template = getattr(plugin, 'default_template', '')
     ignore_tag = getattr(plugin, 'ignore_tag', None)
     regions = getattr(plugin, 'regions', 'ec2_us_east').split(',')
+    poller_tag = getattr(plugin, 'poller_tag', None)
     
-    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template, ignore_tag,regions)
+    instance = AWS_importer_arbiter(plugin, api_key, secret, default_template, ignore_tag,regions,poller_tag)
     return instance
 
 
 # Retrieve hosts from AWS API
 class AWS_importer_arbiter(BaseModule):
-    def __init__(self, mod_conf, api_key, secret, default_template, ignore_tag, regions):
+    def __init__(self, mod_conf, api_key, secret, default_template, ignore_tag, regions, poller_tag):
         BaseModule.__init__(self, mod_conf)
         self.api_key = api_key
         self.secret = secret
         self.default_template = default_template
         self.ignore_tag = ignore_tag
         self.regions = regions
+        self.poller_tag = poller_tag
         self.cons = []
 
 
@@ -147,6 +149,10 @@ class AWS_importer_arbiter(BaseModule):
                 # first
                 tags.reverse()
                 h['use'] = ','.join(tags)
+                if self.poller_tag == 'availabilityzone':
+                    h['poller_tag'] = h['_EC2_AVAILABILITY']
+                elif self.poller_tag == 'region':
+                    h['poller_tag'] = h['_EC2_AVAILABILITY'][:-1].replace('-','_').upper()
                 hosts.append(h)
 
         print "Discovered hosts"
