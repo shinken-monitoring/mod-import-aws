@@ -22,7 +22,7 @@ Prerequisites
   
 
 
-Configuring the Landscape import module 
+Configuring the AWS import module 
 ========================================
 
 
@@ -43,8 +43,8 @@ In your shinken-specific.cfg file, just add (or uncomment):
   
   
 
-* Put in key and secret your private Landscape access.
-  * default_template will be used if your host is not "tagged" in Landscape
+* Put in key and secret your private AWS access.
+  * default_template will be used if your host is not "tagged" in AWS
 
 
 Configuring the Arbiter module 

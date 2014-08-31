@@ -48,7 +48,7 @@ properties = {
 
 # called by the plugin manager to get a broker
 def get_instance(plugin):
-    logger.debug("[AWS Importer Module]: Get Landscape importer instance for plugin %s" % plugin.get_name())
+    logger.debug("[AWS Importer Module]: Get AWS importer instance for plugin %s" % plugin.get_name())
 
     if not Provider:
         raise Exception('Missing module libcloud. Please install it from http://libcloud.apache.org/index.html')
