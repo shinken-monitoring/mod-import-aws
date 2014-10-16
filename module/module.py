@@ -110,16 +110,16 @@ class AWS_importer_arbiter(BaseModule):
             if self.default_template:
                 tags.append(self.default_template)
             tags.append('EC2')
-            # Ok just take the name as uniq host_name
-            h['host_name'] = unicode(n.name)
+            # Append the instance id to the name since AWS allows for Name to be duplicated across instances
+            h['host_name'] = unicode(n.name + "_" + n.id)
             
             # Now the network part, try to get some :)
             try:
-                h['_EC2_PRIVATE_IP'] = unicode(n.private_ip[0])
+                h['_EC2_PRIVATE_IP'] = unicode(n.private_ips[0])
             except IndexError:
                 h['_EC2_PRIVATE_IP'] = u''
             try:
-                h['_EC2_PUBLIC_IP'] = unicode(n.public_ip[0])
+                h['_EC2_PUBLIC_IP'] = unicode(n.public_ips[0])
             except IndexError:
                 h['_EC2_PUBLIC_IP'] = u''
 
@@ -129,7 +129,10 @@ class AWS_importer_arbiter(BaseModule):
             for (k, v) in n.extra.iteritems():
                 prop = '_EC2_'+k.upper()
                 if isinstance(v, list):
-                    h[prop] = ','.join(filter(None,v))
+                    try:
+                        h[prop] = ','.join(filter(None,v))
+                    except TypeError:
+                        logger.debug(k + " is not a simple list: " + str(v))
                 elif isinstance(v, dict):
                     h[prop] = ','.join(['%s:%s' % (i, j) for (i,j) in v.iteritems()])
                 else:
