@@ -13,6 +13,10 @@
     {
       "name": "Andrus Viik",
       "email": "andrus@a7k.pri.ee"
+    },
+    {
+      "name": "Chris Ferry",
+      "email": "chris.ferry@samsung.com"
     }  
   ],
   "repository": "https://github.com/shinken-monitoring/mod-import-aws",
