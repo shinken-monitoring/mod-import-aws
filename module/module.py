@@ -82,7 +82,7 @@ class AWS_importer_arbiter(BaseModule):
     def init(self):
         logger.debug("[AWS Importer Module]: Try to open a AWS connection")
         for region in self.regions:
-            self.cons.append(get_driver(region)(self.api_key, self.secret))
+            self.cons.append(get_driver(getattr(Provider, region.upper()))(self.api_key, self.secret))
 
         logger.info("[AWS Importer Module]: Connection opened")
 
