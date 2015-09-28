@@ -122,9 +122,13 @@ class AWS_importer_arbiter(BaseModule):
                 h['_EC2_PUBLIC_IP'] = unicode(n.public_ips[0])
             except IndexError:
                 h['_EC2_PUBLIC_IP'] = u''
+            
+            # use public ip, else fall back to private one
+            if h['_EC2_PUBLIC_IP']:
+                h['address'] = h['_EC2_PUBLIC_IP']
+            elif h['_EC2_PRIVATE_IP']:
+                h['address'] = h['_EC2_PRIVATE_IP']
 
-            # If hope your public ip is ok, becaue we will use it as address :)
-            h['address'] = h['_EC2_PUBLIC_IP']
             # Ok massive macro setup, but if possible in a clean way
             for (k, v) in n.extra.iteritems():
                 prop = '_EC2_'+k.upper()
