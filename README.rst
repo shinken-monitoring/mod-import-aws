@@ -41,6 +41,8 @@ In your shinken-specific.cfg file, just add (or uncomment):
    api_key              PAAAB2CILT80I0ZA0999
    secret           GGtWAAAzEItz0utWUeCe9BJKIYWX/hdSbA6YCHHH
    default_template generic-host        ; if the host is not tagged, use this one
+   
+   regions          us-east-1 ;
    }
   
   
